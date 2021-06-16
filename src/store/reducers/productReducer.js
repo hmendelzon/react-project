@@ -1,76 +1,57 @@
 import produce from 'immer';
 import createReducer from './reducerUtil';
+import bread from '../../images/bread.jpg'
+import milk from '../../images/milk.jpg'
+import sugar from '../../images/sugar.jpg'
 const initialState = {
-    products: null
-    // [
-    // {
-    //     name: "bread",
-    //     price: 7,
-    // },
-    // {
-    //     name: "milk",
-    //     price: 7,
-    // },
-    // {
-    //     name: "sugar",
-    //     price: 7,
-    // }
-    // ]
+    products:
+        [
+            {
+                name: "bread",
+                price: 7,
+                image: bread
+            },
+            {
+                name: "milk",
+                price: 5,
+                image: milk
+            },
+            {
+                name: "sugar",
+                price: 3,
+                image: sugar
+            }
+        ]
     ,
     selectedProducts: []
 
 };
 
 const products = {
-    initProducts(state, action) {
-        state.products = action.payload;
-    },
     addProductToCustomer(state, action) {
-        state.selectedProducts.push(action.payload)
-    },
-    oneMoreProduct(state, action) {
-        let p = Array.find(state.selectedProducts(p => p.name = action.payload.name));
-        p.amount++;
-    },
-    oneLessProduct(state, action) {
-        let p = Array.find(state.selectedProducts(p => p.name = action.payload.name));
-        if (p.amount === 1) {
-            let pos = state.selectedProducts.indexOf(p);
-            state.selectedProducts.splice(pos, 1)
+        let pro = state.selectedProducts.find(p => p.product.name === action.payload.name);
+        if (!pro) {
+            let product=action.payload
+            state.selectedProducts.push({product,amount:1})
         }
         else
-            p.amount--
+            pro.amount++;
+    },
+    oneLessProduct(state, action) {
+        let pro = state.selectedProducts.find(p => p.product.name === action.payload.name);
+        if (pro.amount===1) {
+            let product=action.payload
+            state.selectedProducts=state.selectedProducts.filter({product,amount:1})
+        }
+        else
+            pro.amount--;
     },
     removeProductToCustomer(state, action) {
-        state.selectedProducts.filter(p => p.name !== action.payload)
+        state.selectedProducts= state.selectedProducts.filter(p => p.product.name !== action.payload.name)
     },
     getProducts(state, action) {
     },
-    patchProduct(state, action) {
-        //fetch
 
-
-        
-        const url=`http://localhost:3002/setName/${action.payload.id}`
-        
-        
-        fetch(url,
-            {
-                method: "PATCH",
-                headers: { "Authorization": "eyJhbGciOiJIUzI1NiJ9.bXkgZmlyc3QgZnVsbHN0YWsgcHJvamVjdCBpbiByZWFjdA.uCYy-Mfr3mzANnnDxtZLzHuInC_vbL_TBT5cOI8GKnA",
-                    "Content-Type": "application/json"},
-                body: JSON.stringify({ name: action.payload.name }),
-            })
-            .then(data=>console.log(data))
-            .catch(err => alert(err));
-
-        //axios
-        // axios.get(`http://localhost:3002/getAllProducts`)
-        //     .then(res => res.data)
-        //     .then(res => dispatch(actions.initProducts(res)))
-        //     .catch(err => alert(err));
-
-    },
 }
 export default produce(
     (state, action) => createReducer(state, action, products)
